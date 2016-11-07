@@ -1,0 +1,49 @@
+float X = 0;
+float Y = 0;
+float speed = 30;
+PImage img;
+
+
+void setup(){
+  size(600,600);
+  smooth();
+  img = loadImage("/Users/davidacevedo/Desktop/room_test.jpg");
+}
+
+void draw(){
+  background(100,100,100);
+  fill(230);
+  image(img,0,0,width,height);
+  textSize(32);
+  text(X, 10, 30); 
+  text(Y,10,60);
+  fill(0, 102, 153);
+  rect(X,Y,30,30);
+  for(int i = 0; i<= width; i++){
+    fill(256,256,256);
+    rect(i*30,0,1,600);
+  }
+  for(int i = 0; i<= width; i++){
+    fill(256,256,256);
+    rect(0,i*30,600,1);
+    
+  }
+  
+}
+
+void keyPressed(KeyEvent e){
+ if(key == CODED){
+  if(keyCode == UP && !((Y-30)<0)){
+    Y -= speed;
+  }
+  else if(keyCode == DOWN && !((Y+30)>=600)){
+   Y += speed; 
+  }
+  else if(keyCode == LEFT && !((X-30)<0)){
+    X -= speed;
+  }
+  else if(keyCode == RIGHT && !((X+30)>=600)){
+    X += speed;
+  } 
+ }
+}
