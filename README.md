@@ -1,2 +1,0 @@
-# FinalProject
-Intro Final Project
