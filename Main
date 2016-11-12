@@ -1,5 +1,7 @@
-float X = 0;
-float Y = 0;
+float cX = 0;
+float cY = 0;
+float bX = 0;
+float bY = 0;
 float speed = 30;
 PImage img;
 
@@ -7,18 +9,18 @@ PImage img;
 void setup(){
   size(600,600);
   smooth();
-  img = loadImage("/Users/davidacevedo/Desktop/room_test.jpg");
+  img = loadImage("/Users/davidacevedo/Desktop/testintroitc/background_hospital.jpg");  
 }
 
 void draw(){
   background(100,100,100);
   fill(230);
-  image(img,0,0,width,height);
+  image(img,bX,bY,1280,800);
   textSize(32);
-  text(X, 10, 30); 
-  text(Y,10,60);
+  text(cX, 10, 30); 
+  text(cY,10,60);
   fill(0, 102, 153);
-  rect(X,Y,30,30);
+  rect(cX,cY,30,30);
   for(int i = 0; i<= width; i++){
     fill(256,256,256);
     rect(i*30,0,1,600);
@@ -33,17 +35,27 @@ void draw(){
 
 void keyPressed(KeyEvent e){
  if(key == CODED){
-  if(keyCode == UP && !((Y-30)<0)){
-    Y -= speed;
+  if(keyCode == UP && !((cY-30)<0)){
+    cY -= speed;
   }
-  else if(keyCode == DOWN && !((Y+30)>=600)){
-   Y += speed; 
+  else if(keyCode == DOWN && !((cY+30)>=600)){
+   cY += speed; 
   }
-  else if(keyCode == LEFT && !((X-30)<0)){
-    X -= speed;
+  else if(keyCode == LEFT && !((cX-30)<0)){
+    cX -= speed;
   }
-  else if(keyCode == RIGHT && !((X+30)>=600)){
-    X += speed;
+  else if(keyCode == RIGHT && !((cX+30)>=600)){
+    cX += speed;
+  } if(keyCode == UP && ((cY-30)<0) && (bY < 0)){
+    bY += speed;
+  } else if(keyCode == DOWN && ((cY+30)>=600) && (bY > -200)){
+    bY -= speed; 
+  }
+  else if(keyCode == LEFT && ((cX-30)<0) && (bX < 0)){
+    bX += speed;
+  }
+  else if(keyCode == RIGHT && ((cX+30)>=600) && (bX > -680)){
+    bX -= speed;
   } 
  }
 }
