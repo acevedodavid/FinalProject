@@ -2,27 +2,38 @@ float cX = 0;
 float cY = 0;
 float bX = 0;
 float bY = 0;
+float imgWidth = 1259*2;
+float imgHeight = 543*2;
 float speed = 30;
-PImage img;
+PImage background;
+PImage frontLayer;
+boolean limU = false;
+boolean limD = false;
+boolean limL = false;
+boolean limR = false;
 
 
 void setup(){
   size(600,600);
   smooth();
-  img = loadImage("/Users/davidacevedo/Desktop/testintroitc/background_hospital.jpg");  
+  background = loadImage("/Users/davidacevedo/Desktop/testintroitc/background_hospital2.png");
+  frontLayer = loadImage("/Users/davidacevedo/Desktop/testintroitc/blackLayer.png");
 }
 
 void draw(){
   background(100,100,100);
   fill(230);
-  image(img,bX,bY,1280,800);
+  image(background,bX,bY,imgWidth,imgHeight);
   textSize(32);
   text(cX, 10, 30); 
   text(cY,10,60);
   fill(0, 102, 153);
   rect(cX,cY,30,30);
+  image(frontLayer,cX-570,cY-570,1170,1170);
+  
+  /* Grid
   for(int i = 0; i<= width; i++){
-    fill(256,256,256);
+    fill(256,256,256);*
     rect(i*30,0,1,600);
   }
   for(int i = 0; i<= width; i++){
@@ -30,32 +41,45 @@ void draw(){
     rect(0,i*30,600,1);
     
   }
-  
+  */
 }
 
 void keyPressed(KeyEvent e){
+  limU = checkBoundaries(0);
+  limR = checkBoundaries(1);
+  limD = checkBoundaries(2);
+  limL = checkBoundaries(3);
+  
  if(key == CODED){
-  if(keyCode == UP && !((cY-30)<0)){
+  if(keyCode == UP && !((cY-30)<0) && !limU){
     cY -= speed;
   }
-  else if(keyCode == DOWN && !((cY+30)>=600)){
+  else if(keyCode == DOWN && !((cY+30)>=600) && !limD){
    cY += speed; 
   }
-  else if(keyCode == LEFT && !((cX-30)<0)){
+  else if(keyCode == LEFT && !((cX-30)<0) && !limL){
     cX -= speed;
   }
-  else if(keyCode == RIGHT && !((cX+30)>=600)){
+  else if(keyCode == RIGHT && !((cX+30)>=600) && !limR){
     cX += speed;
-  } if(keyCode == UP && ((cY-30)<0) && (bY < 0)){
+  } if(keyCode == UP && ((cY-30)<0) && (bY < 0) && !limU){
     bY += speed;
-  } else if(keyCode == DOWN && ((cY+30)>=600) && (bY > -200)){
+  } else if(keyCode == DOWN && ((cY+30)>=600) && (bY > 600-imgHeight) && !limD){
     bY -= speed; 
-  }
-  else if(keyCode == LEFT && ((cX-30)<0) && (bX < 0)){
+  } else if(keyCode == LEFT && ((cX-30)<0) && (bX < 0) && !limL){
     bX += speed;
-  }
-  else if(keyCode == RIGHT && ((cX+30)>=600) && (bX > -680)){
+  } else if(keyCode == RIGHT && ((cX+30)>=600) && (bX > 600-imgWidth) && !limR){
     bX -= speed;
   } 
  }
+}
+
+boolean checkBoundaries(int direction){
+  if(direction == 0){
+    
+  } else if(direction == 1){
+  } else if(direction == 2){
+  } else if(direction == 3){
+  } 
+  return false;
 }
