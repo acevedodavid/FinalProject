@@ -1,58 +1,36 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.Scanner;
 import java.util.*;
 import java.io.*;
 
 
 //Variables declarations
-float cX, cY, bX, bY = 0; //character (c) and background (b) positions within the screen
+float cX = 300; //X position
+float cY = 300; //Y position
+float bX, bY = 0; //Background (b) positions within the screen
 float imgWidth = 5064;
 float imgHeight = 2154;
 float speed = 30; //Displacement between each position
 PImage background;
 PImage frontLayer;
-//boolean limU, limD, limL, limR = false;
-int[][] limMatrix = new int[168][71]; //Matrix containing the cell occupation information.
-Scanner inputStream = null; // limits scanner
-File file = new File("Users/davidacevedo/Desktop/proyectoIntro/limitsPositions.txt"); //limits file, file containing the informationfor limMatrix.
+PImage character;
+PImage fuse;
+PImage ghost;
 boolean setUp = true; //if setup fails the boolean is changed.
-int matrixPosX, matrixPosY = 0; //character position within the matrix
+int matrixPosX = 10; //Starting character X position within the matrix.
+int matrixPosY = 10; //Starting character Y position within the matrix
+int fusesNumber = 4;//number of fuses collected
+float battery = 180;
+int counter = 0; 
 
 //Main Setup
 void setup(){
   size(600,600); //Screen size, 600x600 pixels
+  frameRate(30);//30 frames per second
   smooth();
-  background(0,0,0); //background color = black
-  background = loadImage("map.png"); //map
-  frontLayer = loadImage("blackLayer.png"); //lantern
-  try{
-    System.out.println("Before lscan");
-    inputStream = new Scanner (file);
-    System.out.println("after lscan before fors");
-    for(int k = 0; k < limMatrix.length; k++){
-      for(int l = 0; l< limMatrix[k].length; l++){
-        limMatrix[l][k] = Integer.parseInt(inputStream.nextLine());
-      }
-    }
-    inputStream.close();
-    System.out.println("after fors");
-    for(int k = 0; k < limMatrix.length; k++){
-      for(int l = 0; l< limMatrix[k].length; l++){
-        System.out.print(limMatrix[l][k]);
-      }
-      System.out.println("");
-    }
-    
-  } catch(FileNotFoundException e){
-    setUp = false;
-    System.out.println("File not found");
-  }
+  background = loadImage("images/map.png"); //map
+  frontLayer = loadImage("images/lantern.png"); //lantern
+  character = loadImage("images/character.png");//character
+  fuse = loadImage("images/fuse.png");//fuse
+  ghost = loadImage("images/ghost.png");//ghost
 }
 
 //Screen "drawing" (animations)
@@ -62,12 +40,23 @@ void draw(){
     textSize(32);
     text("Something went wrong", 0,200);  
   } else {
-    background(100,100,100);
-    fill(230);
+    background(256,256,256);
+    //fill(0,0,0);
+    //rect(600,600,0,0);
     image(background,bX,bY,imgWidth,imgHeight);
-    fill(0, 102, 153);
-    rect(cX,cY,30,30);
-    image(frontLayer,cX-570,cY-570,1170,1170);  
+    image(character,cX,cY,30,30);
+    //image(fuse,0,0,30,60);
+    //image(ghost,00,00,60,60);
+    //image(frontLayer,cX-570,cY-570,1170,1170);  
+    //barFuses();
+    //barBattery();
+    lines();
+    counter++;
+    if(battery != 0 && counter == 30){
+      battery--;
+      counter = 0; 
+    }
+    
     fill(230);
     textSize(32);
     text(cX, 10, 30); 
@@ -81,33 +70,20 @@ void draw(){
 void keyPressed(KeyEvent e){
  if(key == CODED){
   try{
-    if(keyCode == UP && !((cY-30)<0) && limMatrix[matrixPosX][matrixPosY - 1] == 0){
-      cY -= speed;
-      matrixPosY--;
-    }
-    else if(keyCode == DOWN && !((cY+30)>=600) && limMatrix[matrixPosX][matrixPosY + 1] == 0){
-      cY += speed;
-      matrixPosY++;
-    }
-    else if(keyCode == LEFT && !((cX-30)<0) && limMatrix[matrixPosX - 1][matrixPosY] == 0){
-      cX -= speed;
-      matrixPosX--;
-    }
-    else if(keyCode == RIGHT && !((cX+30)>=600) && limMatrix[matrixPosX + 1][matrixPosY] == 0){
-      cX += speed;
-      matrixPosX++;
-    } if(keyCode == UP && ((cY-30)<0) && (bY < 0) && limMatrix[matrixPosX][matrixPosY - 1] == 0){
+    if(matrixPosX+1<=168 || matrixPosX-1>=0 || matrixPosY+1<=71 || matrixPosY-1>=0){
+      if(keyCode == UP  && limMatrix[matrixPosY-1][matrixPosX] == 0){
       bY += speed;
       matrixPosY--;
-    } else if(keyCode == DOWN && ((cY+30)>=600) && (bY > 600-imgHeight) && limMatrix[matrixPosX][matrixPosY + 1] == 0){
+    } else if(keyCode == DOWN && limMatrix[matrixPosY+1][matrixPosX] == 0){
       bY -= speed;
       matrixPosY++;
-    } else if(keyCode == LEFT && ((cX-30)<0) && (bX < 0) && limMatrix[matrixPosX - 1][matrixPosY] == 0){
+    } else if(keyCode == LEFT && limMatrix[matrixPosY][matrixPosX-1] == 0){
       bX += speed;
       matrixPosX--;
-    } else if(keyCode == RIGHT && ((cX+30)>=600) && (bX > 600-imgWidth) && limMatrix[matrixPosX + 1][matrixPosY] == 0){
+    } else if(keyCode == RIGHT && ((limMatrix[matrixPosY][matrixPosX+1] == 0))){
       bX -= speed;
       matrixPosX++;
+    }
     }
    } catch(Exception f){
    }
