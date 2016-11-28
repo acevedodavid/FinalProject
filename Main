@@ -1,85 +1,179 @@
-float cX = 0;
-float cY = 0;
-float bX = 0;
-float bY = 0;
-float imgWidth = 1259*2;
-float imgHeight = 543*2;
-float speed = 30;
-PImage background;
 PImage frontLayer;
-boolean limU = false;
-boolean limD = false;
-boolean limL = false;
-boolean limR = false;
+PImage characterUp, characterDown, characterLeft, characterRight;
+PImage fuse;
+PImage ghost;
+Ghost g1 = new Ghost(1,10,10);
+Ghost g2 = new Ghost(2,20,20);
+Ghost g3 = new Ghost(3,30,30);
+Ghost g4 = new Ghost(4,40,40);
+Ghost g5 = new Ghost(5,50,50);
+Ghost g6 = new Ghost(6,60,60);
+boolean game = false;
+boolean setUp = true; //if setup fails the boolean is changed.
+int matrixPosX = 10; //Starting character X position within the matrix.
+int matrixPosY = 10; //Starting character Y position within the matrix
+int fusesNumber = 0;//number of fuses collected
+float battery = 180;
+int counter = 0;
+int direction = 0; //0=up, 1=right, 2=down, 3=left
+Minim minim;
+AudioPlayer player;
 
-
+//Main Setup
 void setup(){
-  size(600,600);
+  size(600,600); //Screen size, 600x600 pixels
+  photo = loadImage("Cover600.png");//MainMenu
+  frameRate(30);//30 frames per second
   smooth();
-  background = loadImage("/Users/davidacevedo/Desktop/testintroitc/background_hospital2.png");
-  frontLayer = loadImage("/Users/davidacevedo/Desktop/testintroitc/blackLayer.png");
+  background = loadImage("images/map.png"); //map
+  frontLayer = loadImage("images/lantern.png"); //lantern
+  characterUp = loadImage("images/characterUP.png");//character
+  characterDown = loadImage("images/characterDOWN.png");//character
+  characterLeft = loadImage("images/characterLEFT.png");//character
+  characterRight = loadImage("images/characterRIGHT.png");//character
+  fuse = loadImage("images/fuse.png");//fuse
+  ghost = loadImage("images/ghost.png");//ghost
+  minim = new Minim(this);
+  player = minim.loadFile("sweetdreams.mp3");
+  //player.loop();
 }
 
+//Screen "drawing" (animations)
 void draw(){
-  background(100,100,100);
-  fill(230);
-  image(background,bX,bY,imgWidth,imgHeight);
-  textSize(32);
-  text(cX, 10, 30); 
-  text(cY,10,60);
-  fill(0, 102, 153);
-  rect(cX,cY,30,30);
-  image(frontLayer,cX-570,cY-570,1170,1170);
+  if(!setUp){
+    background(0,0,0);
+    textSize(32);
+    text("Something went wrong", 0,200);
+  }else if(game){
+    image(photo, 0, 0);
+  textAlign(CENTER);
+  PFont font;
+  PFont fontBig;
+  font = createFont("Lobster 1.4.otf", 42);
+  fontBig = createFont("Lobster 1.4.otf", 52);
+  textFont(font);
+  fill(255, 217, 204);
+  text("-----·-----", 300, 340);
   
-  /* Grid
-  for(int i = 0; i<= width; i++){
-    fill(256,256,256);*
-    rect(i*30,0,1,600);
+  fill(999, 999, 999);
+  if(dist(mouseX,mouseY,300, 386)<25){
+    textFont(fontBig);
+    text("Play Game", 300, 400);
+  } else {
+    textFont(font);
+    text("Play Game", 300, 400);
   }
-  for(int i = 0; i<= width; i++){
-    fill(256,256,256);
-    rect(0,i*30,600,1);
+  
+  if(dist(mouseX,mouseY,300, 450)<20){
+    textFont(fontBig);
+    text("Credits", 300, 460);
+  } else {
+    textFont(font);
+    text("Credits", 300, 460);
+  }
+  } else {
+    background(0);
+    //fill(0,0,0);
+    //rect(600,600,0,0);
+    image(background,bX,bY,imgWidth,imgHeight);
+    switch(direction){
+      case 0: image(characterUp,cX,cY,30,30); break;
+      case 1: image(characterRight,cX,cY,30,30); break;
+      case 2: image(characterDown,cX,cY,30,30); break;
+      case 3: image(characterLeft,cX,cY,30,30); break;
+    }
+    //image(fuse,0,0,30,60);
+    g1.move();
+    g2.move();
+    g3.move();
+    g4.move();
+    g5.move();
+    g6.move();
+    image(frontLayer,-50,-50,700,700);  
+    barFuses();
+    barBattery();
+    lines();
+    counter++;
+    if(battery != 0 && counter == 30){
+      battery--;
+      counter = 0; 
+    }
+    for(int j = -10; j<10; j++){
+      for(int i = -10; i<10; i++){
+        fill(91,194,54);
+        if(matrixPosX+i<168 && matrixPosX+i>=0  && matrixPosY+j<71 && matrixPosY+j>=0){
+          text(limMatrix[matrixPosY+j][matrixPosX+i],(i+10)*30,(j+11)*30); //j+11 because it writes the bottom of the text on the specified one.
+        }
+      }
+    }
     
+/*
+    fill(230);
+    textSize(32);
+    text(cX, 10, 60); 
+    text(cY,10,90);
+    text(matrixPosX,10,120);
+    text(matrixPosY,10,150);
+    */
   }
-  */
 }
 
 void keyPressed(KeyEvent e){
-  limU = checkBoundaries(0);
-  limR = checkBoundaries(1);
-  limD = checkBoundaries(2);
-  limL = checkBoundaries(3);
-  
  if(key == CODED){
-  if(keyCode == UP && !((cY-30)<0) && !limU){
-    cY -= speed;
-  }
-  else if(keyCode == DOWN && !((cY+30)>=600) && !limD){
-   cY += speed; 
-  }
-  else if(keyCode == LEFT && !((cX-30)<0) && !limL){
-    cX -= speed;
-  }
-  else if(keyCode == RIGHT && !((cX+30)>=600) && !limR){
-    cX += speed;
-  } if(keyCode == UP && ((cY-30)<0) && (bY < 0) && !limU){
-    bY += speed;
-  } else if(keyCode == DOWN && ((cY+30)>=600) && (bY > 600-imgHeight) && !limD){
-    bY -= speed; 
-  } else if(keyCode == LEFT && ((cX-30)<0) && (bX < 0) && !limL){
-    bX += speed;
-  } else if(keyCode == RIGHT && ((cX+30)>=600) && (bX > 600-imgWidth) && !limR){
-    bX -= speed;
-  } 
+  try{
+    if(matrixPosX+1<=168 || matrixPosX-1>=0 || matrixPosY+1<=71 || matrixPosY-1>=0){
+      if(keyCode == UP  && (limMatrix[matrixPosY-1][matrixPosX] != 1) && (limMatrix[matrixPosY][matrixPosX+1] != 3)){
+        direction = 0;
+        bY += speed;
+        g1.gpy += speed;
+        g2.gpy += speed;
+        g3.gpy += speed;
+        g4.gpy += speed;
+        g5.gpy += speed;
+        g6.gpy += speed;
+        matrixPosY--;
+      } else if(keyCode == DOWN && (limMatrix[matrixPosY+1][matrixPosX] != 1) && (limMatrix[matrixPosY][matrixPosX+1] != 3)){
+        direction = 2;
+        bY -= speed;
+        g1.gpy -= speed;
+        g2.gpy -= speed;
+        g3.gpy -= speed;
+        g4.gpy -= speed;
+        g5.gpy -= speed;
+        g6.gpy -= speed;
+        matrixPosY++;
+      } else if(keyCode == LEFT && (limMatrix[matrixPosY][matrixPosX-1] != 1) && (limMatrix[matrixPosY][matrixPosX+1] != 3)){
+        direction = 3;
+        bX += speed;
+        g1.gpx += speed;
+        g2.gpx += speed;
+        g3.gpx += speed;
+        g4.gpx += speed;
+        g5.gpx += speed;
+        g6.gpx += speed;
+        matrixPosX--;
+      } else if(keyCode == RIGHT && ((limMatrix[matrixPosY][matrixPosX+1] != 1)) && (limMatrix[matrixPosY][matrixPosX+1] != 3)){
+        direction = 1;
+        bX -= speed;
+        g1.gpx -= speed;
+        g2.gpx -= speed;
+        g3.gpx -= speed;
+        g4.gpx -= speed;
+        g5.gpx -= speed;
+        g6.gpx -= speed;
+        matrixPosX++;
+      } else if(keyCode == UP){
+        direction = 0;  
+      } else if(keyCode == DOWN){
+        direction = 2;
+      } else if(keyCode == RIGHT){
+        direction = 1;
+      } else if(keyCode == LEFT){
+        direction = 3;
+      } else if(keyCode == 32){ //SPACE BAR ASCII = 32
+      }
+    }
+   } catch(Exception f){
+   }
  }
-}
-
-boolean checkBoundaries(int direction){
-  if(direction == 0){
-    
-  } else if(direction == 1){
-  } else if(direction == 2){
-  } else if(direction == 3){
-  } 
-  return false;
 }
