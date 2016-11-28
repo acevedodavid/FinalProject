@@ -5,6 +5,8 @@ public class Ghost{
   int gpx;
   int gpy;
   int displacement = 0;
+  boolean hasPlayed = false;
+  boolean touchedPlayer = false;
   int direction;
   String temp;
   
@@ -19,20 +21,33 @@ public class Ghost{
   }
   
   void move(){
-    image(ghost,this.gpx,this.gpy,90,90);  
+    image(ghost,this.gpx,this.gpy,90,90);
     for(int j = 0; j<3; j++){
         for(int i = 0; i<3; i++){
-            ghostMatrix[this.gy+j][this.gx+i] = 1;
+            if(matrixPosX == this.gx+i && matrixPosY == this.gy+j){
+              touchedPlayer = true;
+            };
         }
     }
+    /*
     for(int l= 0 ; l<3; l++){
       switch(this.direction){
-        case 0: ghostMatrix[this.gy+3][this.gx+l] = 0;
-        case 1: ghostMatrix[this.gy+l][this.gx-1] = 0;
-        case 2: ghostMatrix[this.gy-1][this.gx+l] = 0;
-        case 3: ghostMatrix[this.gy+l][this.gx+3] = 0;
+        case 0: secondaryMatrix[this.gy+3][this.gx+l] = 0;
+        case 1: secondaryMatrix[this.gy+l][this.gx-1] = 0;
+        case 2: secondaryMatrix[this.gy-1][this.gx+l] = 0;
+        case 3: secondaryMatrix[this.gy+l][this.gx+3] = 0;
       }
     }
+    */
+    if(touchedPlayer && !hasPlayed){
+      death.play();
+      hasPlayed = true;
+      bMusic.stop();
+      playing = false;
+      freeze = true;
+      won = false;
+    }
+    
     
     //Part to make the ghost move in square
     //0 = up, 1 = right, 2 = down, 3 = left
